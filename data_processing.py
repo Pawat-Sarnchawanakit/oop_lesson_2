@@ -121,4 +121,9 @@ for item in my_countriesTable.table:
     my_citiesTable_filtered = my_citiesTable.filter(lambda x: x['country'] == item['country'])
     if len(my_citiesTable_filtered.table) >= 1:
         print(item['country'], my_citiesTable_filtered.aggregate(lambda x: min(x), 'latitude'), my_citiesTable_filtered.aggregate(lambda x: max(x), 'latitude'))
-print()
+print("\nPlayers on a team with “ia” in the team name, played less than 200 minutes and made more than 100 passes")
+for plr in plrsTable.filter(lambda x: "ia" in x["team"] and float(x["minutes"]) < 200 and int(x["passes"]) > 100).table:
+    print(plr["surname"], plr["team"], plr["position"])
+print("\nAverage number of games played for teams ranking below 10 versus teams ranking above or equal 10 respectively: ",\
+    teamsTable.filter(lambda x: int(x["ranking"]) < 10).aggregate(lambda x: sum(x)/len(x), "games"), \
+    teamsTable.filter(lambda x: int(x["ranking"]) >= 10).aggregate(lambda x: sum(x)/len(x), "games"))
