@@ -47,10 +47,10 @@ class Table:
                 filtered_table.table.append(item1)
         return filtered_table
     
-    def aggregate(self, function, aggregation_key):
+    def aggregate(self, function, aggregation_key, cast=float):
         temps = []
         for item1 in self.table:
-            temps.append(float(item1[aggregation_key]))
+            temps.append(cast(item1[aggregation_key]))
         return function(temps)
     
     def select(self, attributes_list):
@@ -127,3 +127,12 @@ for plr in plrsTable.filter(lambda x: "ia" in x["team"] and float(x["minutes"]) 
 print("\nAverage number of games played for teams ranking below 10 versus teams ranking above or equal 10 respectively: ",\
     teamsTable.filter(lambda x: int(x["ranking"]) < 10).aggregate(lambda x: sum(x)/len(x), "games"), \
     teamsTable.filter(lambda x: int(x["ranking"]) >= 10).aggregate(lambda x: sum(x)/len(x), "games"))
+
+# The average fare paid by passengers in the first class versus in the third class
+print("\nAverage fare paid by passengers in the first class versus in the third class respectively: ",\
+    titanicTable.filter(lambda x: x["class"] == '1').aggregate(lambda x: sum(x)/len(x), "fare"), \
+    titanicTable.filter(lambda x: x["class"] == '3').aggregate(lambda x: sum(x)/len(x), "fare"))
+# The survival rate of male versus female passengers
+print("\nSurvival rate of male versus female passengers respectively: ",\
+    str(titanicTable.filter(lambda x: x["gender"] == 'M').aggregate(lambda x: (sum(x)/len(x))*100, "survived", lambda x: 0 if x == "no" else 1))+"%", \
+    str(titanicTable.filter(lambda x: x["gender"] == 'F').aggregate(lambda x: (sum(x)/len(x))*100, "survived", lambda x: 0 if x == "no" else 1))+"%")
