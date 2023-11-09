@@ -136,3 +136,5 @@ print("\nAverage fare paid by passengers in the first class versus in the third 
 print("\nSurvival rate of male versus female passengers respectively: ",\
     str(titanicTable.filter(lambda x: x["gender"] == 'M').aggregate(lambda x: (sum(x)/len(x))*100, "survived", lambda x: 0 if x == "no" else 1))+"%", \
     str(titanicTable.filter(lambda x: x["gender"] == 'F').aggregate(lambda x: (sum(x)/len(x))*100, "survived", lambda x: 0 if x == "no" else 1))+"%")
+
+print("\nTotal number of male passengers embarked at Southampton is", len(titanicTable.filter(lambda x: x["gender"] == "M" and x["embarked"] == "Southampton").table))
