@@ -62,7 +62,23 @@ class Table:
                     dict_temp[key] = item1[key]
             temps.append(dict_temp)
         return temps
-
+    def pivot_table(self, a, b, f, f2=None):
+        if f2 == None:
+            f2 = [lambda x: x]*len(f);
+        lel = {}
+        for cur in self.table:
+            key = '-'.join([f"{hash(cur[c]):X}" for c in a]);
+            if not key in lel:
+                lel[key] = [[cur[c] for c in a]]+[[] for _ in range(len(b))]
+        for cur in self.table:
+            cat = lel['-'.join([f"{hash(cur[c]):X}" for c in a])];
+            for i in range(len(b)):
+                cat[i + 1].append(f2[i](cur[b[i]]))
+        ret = [];
+        for v in lel.values():
+            ret.append(v[0]);
+            ret.append([f[i](v[i + 1]) for i in range(len(v)-1)]);
+        return ret;
     def __str__(self):
         return self.table_name + ':' + str(self.table)
 
@@ -136,3 +152,9 @@ print("\nAverage fare paid by passengers in the first class versus in the third 
 print("\nSurvival rate of male versus female passengers respectively: ",\
     str(titanicTable.filter(lambda x: x["gender"] == 'M').aggregate(lambda x: (sum(x)/len(x))*100, "survived", lambda x: 0 if x == "no" else 1))+"%", \
     str(titanicTable.filter(lambda x: x["gender"] == 'F').aggregate(lambda x: (sum(x)/len(x))*100, "survived", lambda x: 0 if x == "no" else 1))+"%")
+
+print('\n', titanicTable.pivot_table(['embarked', 'gender', 'class'], ['fare', 'fare', 'fare', 'last'], [lambda x: min(x), lambda x: max(x), lambda x: sum(x)/len(x), lambda x: len(x)], [float]*3+[lambda x: x]))
+
+print('\n', plrsTable.pivot_table(['position'], ['passes', 'shots'], [lambda x: sum(x)/len(x)]*2, [float]*2))
+
+print('\n', countriesTable.filter(lambda x: citiesTable.filter(lambda y: y['country'] == x['country']).table).pivot_table(['EU', 'coastline'], ['country', 'country', 'country'], [lambda x: sum([a[0] for a in x])/sum([a[1] for a in x]), lambda x: min(x), lambda x: max(x)], [lambda x: citiesTable.filter(lambda y: y["country"] == x).aggregate(lambda z: (sum(z),len(z)), "temperature"), lambda x: citiesTable.filter(lambda y: y["country"] == x).aggregate(lambda z: min(z) if z else None, "latitude"), lambda x: citiesTable.filter(lambda y: y["country"] == x).aggregate(lambda z: max(z) if z else -9e999, "latitude")]))
